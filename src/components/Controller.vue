@@ -15,6 +15,25 @@
     ><h3>0º</h3>
     </circle-slider>
     <h1>{{ temperature }} <span>&#176;</span> </h1>
+    <div id="toggles">
+      <br>
+        <div class="field">
+            <b-switch v-model="motor"
+                true-value="1"
+                false-value="0"
+                @click.native="switchMotor()">
+                <p style="width:20px;">Motor</p>
+            </b-switch>
+        </div>
+        <div class="field">
+            <b-switch v-model="calentador"
+                true-value="1"
+                false-value="0"
+                @click.native="switchCalentador()">
+                <p style="width:20px;">Calentador</p>
+            </b-switch>
+        </div>
+    </div>
   </div>
 </template>
 
@@ -31,27 +50,49 @@ export default {
   },
   data: () => {
     return {
-      temperature: 23
+      temperature: 23,
+      calentador: 0,
+      motor: 0
     }
   },
   watch: {
     temperature: function(val)
     {
-      this.$mqtt.publish('homie/mkr1000/envshield/temperatura', new Buffer(String(val)), {qos:1, retain:false}, function(){
+      this.$mqtt.publish('Homie/MKR1000/MKRCORE/Thermostat/Set', new Buffer(String(val)), {qos:1, retain:false}, function(){
         //console.log(err)
       })
     }
   },
   methods: {
-    publish () {
-      console.log(this.sliderValue)
-      console.log(this.$mqtt)
-      this.$mqtt.publish('test', String(this.sliderValue))
+    switchMotor () {
+      const val = (this.motor == 0) ? 1 : 0
+      console.log(val)
+      this.$mqtt.publish('Homie/MKR1000/MKRCORE/Relay01/Set', new Buffer(String(val)), {qos:1, retain:false}, function(){
+        //console.log(err)
+      })
+    },
+    switchCalentador () {
+      const val = (this.calentador == 0) ? 1 : 0
+      this.$mqtt.publish('Homie/MKR1000/MKRCORE/Relay02/Set', new Buffer(String(val)), {qos:1, retain:false}, function(){
+        //console.log(err)
+      })
     }
   },
   mqtt: {
-    'homie/mkr1000/envshield/temperatura' (data, topic) {
-      console.log(topic + ': ' + String.fromCharCode.apply(null, data))
+    'Homie/#' (data, topic) {
+      const value = String.fromCharCode.apply(null, data)
+      if(topic === "Homie/MKR1000/MKRENV/Temperature") {
+        console.log(topic + ': ' + String.fromCharCode.apply(null, data))
+        this.temperature = parseInt(value)
+      }
+      if(topic === "Homie/MKR1000/MKRRELAY/Relay01") {
+        console.log(topic + ': ' + String.fromCharCode.apply(null, data))
+        this.calentador = parseInt(value)
+      }
+      if(topic === "Homie/MKR1000/MKRRELAY/Relay02") {
+        console.log(topic + ': ' + String.fromCharCode.apply(null, data))
+        this.motor = parseInt(value)
+      }
     }
   }
 }
@@ -73,4 +114,9 @@ li {
 a {
   color: #42b983;
 }
+
+#toggles {
+  margin-top:50px;
+}
+
 </style>

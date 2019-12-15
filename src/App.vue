@@ -18,20 +18,36 @@
         </template>
     </b-navbar>
     <router-view id="view"/>
+    <div id="serverinfo">online: {{ serverOnline }} messages: {{ recivedMessages }} <br>latest: {{ latestMessage }}</div>
   </div>
 </template>
 <script>
 export default {
   name: 'app',
+  data: () => {
+    return {
+      serverOnline: false,
+      recivedMessages: 0,
+      latestMessage: ''
+    }
+  },
   mounted ()
   {  
-    this.$mqtt.on('connect', () => {console.log('connect')
-      this.$mqtt.subscribe('homie/mkr1000/envshield/temperatura')
+    this.$mqtt.on('connect', () => {
+      console.log('connect')
+      this.$mqtt.subscribe('Homie/#')
+      this.serverOnline = true;
     })
-    //this.$mqtt.on('message', () => {console.log('message')})
+    this.$mqtt.on('message', (m) => {
+      this.recivedMessages += 1
+      this.latestMessage = m
+      //console.log('message')
+       //console.log(i)
+    })
     this.$mqtt.on('close', (e) => {
       console.log('close')
       console.log(e)
+      this.serverOnline = false;
     })
     this.$mqtt.on('disconnect', () => {console.log('disconnect')})
     this.$mqtt.on('error', () => {console.log('error')})
@@ -55,6 +71,10 @@ body {
 }
 #view {
   margin-top: 150px;
+}
+#serverinfo {
+  margin-top: 100px;
+  font-size: 9px;
 }
 </style>
 
