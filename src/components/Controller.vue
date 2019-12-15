@@ -67,13 +67,13 @@ export default {
     switchMotor () {
       const val = (this.motor == 0) ? 1 : 0
       console.log(val)
-      this.$mqtt.publish('Homie/MKR1000/MKRCORE/Relay01/Set', new Buffer(String(val)), {qos:1, retain:false}, function(){
+      this.$mqtt.publish('Homie/MKR1000/MKRRELAY/Relay01/Set', new Buffer(String(val)), {qos:1, retain:false}, function(){
         //console.log(err)
       })
     },
     switchCalentador () {
       const val = (this.calentador == 0) ? 1 : 0
-      this.$mqtt.publish('Homie/MKR1000/MKRCORE/Relay02/Set', new Buffer(String(val)), {qos:1, retain:false}, function(){
+      this.$mqtt.publish('Homie/MKR1000/MKRRELAY/Relay02/Set', new Buffer(String(val)), {qos:1, retain:false}, function(){
         //console.log(err)
       })
     }
@@ -87,11 +87,11 @@ export default {
       }
       if(topic === "Homie/MKR1000/MKRRELAY/Relay01") {
         console.log(topic + ': ' + String.fromCharCode.apply(null, data))
-        this.calentador = parseInt(value)
+        this.motor = parseInt(value)
       }
       if(topic === "Homie/MKR1000/MKRRELAY/Relay02") {
         console.log(topic + ': ' + String.fromCharCode.apply(null, data))
-        this.motor = parseInt(value)
+        this.calentador = parseInt(value)
       }
     }
   }
