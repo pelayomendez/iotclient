@@ -1,4 +1,5 @@
 
+/*
 const path = require('path')
 
 const host = '172.24.71.188'
@@ -23,4 +24,4 @@ module.exports = {
     },
   }
 }
-
+*/
